@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Documento</title>
+    <link rel="stylesheet" href="CSS/estilosegunda.css">
+</head>
+<body>
+
+    <!-- Menú lateral -->
+    <div id="menuContainer"></div>
+
+    <div class="container">
+        <div class="preview-section">
+            <h3>Vista Previa</h3>
+            <div class="preview-box">
+                <img src="camera-icon.png" alt="Cámara" id="preview-image">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <label for="file-name">Nombre del Archivo</label>
+            <input type="text" id="file-name" placeholder="Ingrese el nombre del archivo">
+
+
+            <label for="file-format">Guardar como</label>
+            <select id="file-format">
+                <option>PDF</option>
+                <option>DOCX</option>
+                <option>TXT</option>
+                <option>PNG</option>
+                <option>JPG</option>
+            </select>
+        </div>
+
+        <div class="summary-section">
+            <h3>Resumen generado con IA</h3>
+            <div class="summary-box">
+                
+                <div id="summary-text" contenteditable="true" class="editable-box">
+                    Las patatas son <strong>tubérculos comestibles</strong> que pertenecen a la familia de las solanáceas. Son ricas en nutrientes como el potasio y la vitamina C, y tienen muchos beneficios para la salud.
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

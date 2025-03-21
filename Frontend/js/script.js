@@ -68,3 +68,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+    const fileNameInput = document.getElementById("file-name");
+    const fileFormatSelect = document.getElementById("file-format");
+    const previewImage = document.getElementById("preview-image");
+    
+    // Evento para cambiar la imagen de vista previa (Ejemplo: cuando cambia el formato de guardado)
+    fileFormatSelect.addEventListener("change", function() {
+        if (fileFormatSelect.value === "PDF") {
+            previewImage.src = "pdf-icon.png";
+        } else if (fileFormatSelect.value === "DOCX") {
+            previewImage.src = "word-icon.png";
+        } else {
+            previewImage.src = "text-icon.png";
+        }
+    });
+});
