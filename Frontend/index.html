@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Almacenamiento de Documentos</title>
+    <link rel="stylesheet" href="CSS/estilos.css">
+</head>
+<body>
+    <!-- Menú lateral -->
+    <div id="menuContainer"></div>
+
+    <div class="contenido">
+        <h1>📁 Almacenamiento de Documentos</h1>
+
+        <!-- Formulario para subir documentos -->
+        <section id="subir-documento">
+            <h2>📤 Subir Documento</h2>
+            <form id="form-subir">
+                <input type="text" id="nombre-documento" placeholder="Nombre del documento" required>
+                <select id="tipo-documento">
+                    <option value="Financiero">Financiero</option>
+                    <option value="Inventario">Inventario</option>
+                    <option value="Reunión">Reunión</option>
+                    <option value="Otro">Otro</option>
+                </select>
+                <input type="file" id="archivo" multiple required>
+                <button type="submit">Subir</button>
+            </form>
+        </section>
+
+        <!-- Motor de búsqueda -->
+        <section id="busqueda">
+            <h2>🔍 Buscar Documentos</h2>
+            <input type="text" id="buscar" placeholder="Buscar por nombre o palabra clave...">
+            <select id="filtro-tipo">
+                <option value="todos">Todos</option>
+                <option value="Financiero">Financiero</option>
+                <option value="Inventario">Inventario</option>
+                <option value="Reunión">Reunión</option>
+                <option value="Otro">Otro</option>
+            </select>
+        </section>
+
+        <!-- Lista de documentos -->
+        <section id="lista-documentos">
+            <h2>📄 Documentos Guardados</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Fecha</th>
+                        <th>Resumen</th>
+                        <th>Palabras Clave</th>
+                        <th>Archivo</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-documentos">
+                    <!-- Aquí se llenarán los documentos dinámicamente -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+    
+    <script src="js/script.js"></script>
+</body>
+</html>

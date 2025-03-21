@@ -1,0 +1,114 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 0;
+    text-align: center;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+section {
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f4f4f4;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input, select, button {
+    padding: 10px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #ddd;
+}
+
+/* Menú lateral */
+.menu-lateral {
+    position: fixed;
+    left: -250px;
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #333;
+    color: white;
+    transition: left 0.3s;
+    padding-top: 60px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.menu-lateral.active {
+    left: 0;
+}
+
+.hamburguesa {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    font-size: 30px;
+    cursor: pointer;
+    color: white;
+    background-color: #333;
+    padding: 5px;
+    border-radius: 5px;
+    z-index: 1000;
+    transition: all 0.3s ease-in-out;
+}
+
+.menu-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-lista li {
+    padding: 15px;
+    border-bottom: 1px solid #444;
+}
+
+.menu-lista li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.menu-lista li a:hover {
+    background-color: #575757;
+}
