@@ -12,13 +12,13 @@
         <!-- input Correo -->
         <label for="email">Email</label>
         <div class="form-input">
-            <input type="email" placeholder="ejemploemail123@gmail.com" required id="email">
+            <input type="email" id="email" placeholder="ejemploemail123@gmail.com" required id="email">
         </div>
         
         <!-- input Contraseña -->
         <label for="Contraseña">Contraseña</label>
         <div class="form-input">
-            <input type="password" placeholder="**********" required id="Contraseña">
+            <input type="password" id="password" placeholder="**********" required id="Contraseña">
         </div>
 
         <p>¿No tienes Cuenta? <a href="register.html">Registrate Aquí</a></p>
@@ -28,5 +28,10 @@
             <button type="submit">Iniciar Sesión</button>
         </div>
     </form>
+
+    <script type="module" src="js/supabase.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    
+
 </body>
 </html>

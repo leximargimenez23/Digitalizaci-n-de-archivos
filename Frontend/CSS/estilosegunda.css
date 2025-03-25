@@ -12,7 +12,8 @@ body {
     background: #A9A9A9;
     padding: 20px;
     border-radius: 10px;
-    width: 600px;
+    width: 690px;
+    height: 750px;
     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
     border: 3px solid black;
 }
@@ -20,6 +21,7 @@ body {
 h3 {
     text-align: center;
     margin-bottom: 15px;
+    font-size: 20px;
 }
 
 .preview-section {
@@ -30,33 +32,37 @@ h3 {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 120px;
-    height: 120px;
+    width: 200px;
+    height: 200px;
     background: black;
     border-radius: 10px;
+    border: 5px solid white;
     margin: 0 auto;
     padding: 10px;
 }
 
 .preview-box img {
-    width: 80px;
+    width: 800px;
 }
 
 .form-section {
     display: flex;
+    font-size: 20px;
+    width: 400px;
     flex-direction: column;
-    margin: 20px 0;
+    margin: 50px 0;
+    margin-left: 140px;
 }
 
 label {
     font-weight: bold;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 input, select {
     background: black;
     color: white;
-    border: 2px solid white;
+    border: 5px solid white;
     padding: 8px;
     border-radius: 5px;
     margin-top: 5px;
@@ -64,15 +70,18 @@ input, select {
 
 .summary-section {
     text-align: center;
+    margin-top: 50px;
 }
 
 .summary-box {
     background: black;
+    width: 450px;
     color: white;
     padding: 15px;
     border-radius: 10px;
-    border: 2px solid white;
+    border: 5px solid white;
     margin-top: 10px;
+    margin-left: 100px;
 }
 
 /* Menú lateral */
