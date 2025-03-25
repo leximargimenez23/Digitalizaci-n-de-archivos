@@ -1,40 +1,63 @@
-import { supabase } from "./supabase.js";  // Asegúrate de que la importación sea correcta
+// Importa la biblioteca de Supabase
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+// Configura tu cliente de Supabase con tus credenciales
+const supabaseUrl = "TU_SUPABASE_URL";
+const supabaseAnonKey = "TU_SUPABASE_ANON_KEY";
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Obtener el access_token desde la URL
+const urlParams = new URLSearchParams(window.location.hash.substring(1));
+const accessToken = urlParams.get('access_token');
 
 document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("change-password-form");
+    const form = document.getElementById("reset-password-form");
 
     form.addEventListener("submit", async function (event) {
         event.preventDefault();
 
         const newPassword = document.getElementById("new-password").value;
         const confirmPassword = document.getElementById("confirm-password").value;
+        const mensaje = document.getElementById("mensaje");
 
+        // Validar que las contraseñas coincidan
         if (newPassword !== confirmPassword) {
-            alert("Las contraseñas no coinciden");
+            mensaje.textContent = "❌ Las contraseñas no coinciden.";
+            mensaje.style.color = "red";
             return;
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const accessToken = urlParams.get('access_token');
-
+        // Validar que el token esté presente
         if (!accessToken) {
-            alert("Token de acceso no válido");
+            mensaje.textContent = "❌ Error: No se encontró un token válido.";
+            mensaje.style.color = "red";
             return;
         }
 
         try {
-            const { error } = await supabase.auth.api.updateUser(accessToken, { password: newPassword });
+            // Cambiar la contraseña en Supabase
+            const { error } = await supabase.auth.updateUser({
+                password: newPassword
+            });
 
             if (error) {
-                alert("Error al cambiar la contraseña: " + error.message);
+                mensaje.textContent = `❌ Error al cambiar la contraseña: ${error.message}`;
+                mensaje.style.color = "red";
                 return;
             }
 
-            alert("Contraseña cambiada con éxito");
-            window.location.href = "login.html";  // Redirige a la página de inicio de sesión
+            // Mensaje de éxito y redirección
+            mensaje.textContent = "✅ Contraseña cambiada exitosamente. Redirigiendo...";
+            mensaje.style.color = "green";
+
+            setTimeout(() => {
+                window.location.href = "login.html"; // Redirige al login
+            }, 3000);
+
         } catch (err) {
             console.error("Error inesperado:", err);
-            alert("Error inesperado: " + err.message);
+            mensaje.textContent = `❌ Error inesperado: ${err.message}`;
+            mensaje.style.color = "red";
         }
     });
 });
