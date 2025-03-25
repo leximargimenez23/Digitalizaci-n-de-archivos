@@ -1,10 +1,5 @@
 // Importa la biblioteca de Supabase
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-// Configura tu cliente de Supabase con tus credenciales
-const supabaseUrl = "TU_SUPABASE_URL";
-const supabaseAnonKey = "TU_SUPABASE_ANON_KEY";
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from "./supabase.js";
 
 // Obtener el access_token desde la URL
 const urlParams = new URLSearchParams(window.location.hash.substring(1));
