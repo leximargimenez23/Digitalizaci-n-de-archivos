@@ -1,12 +1,17 @@
-// Importa la biblioteca de Supabase
-import { supabase } from "./supabase.js";
+// Importar la biblioteca de Supabase
+import { supabase } from "./supabase.js"; // Asegúrate de que el archivo `supabase.js` está en la misma carpeta
 
-// Obtener el access_token desde la URL
-const urlParams = new URLSearchParams(window.location.hash.substring(1));
-const accessToken = urlParams.get('access_token');
+// Obtener el `access_token` desde la URL (puede venir en `hash` o `search`)
+const urlParams = new URLSearchParams(window.location.search);
+const accessToken = urlParams.get("access_token");
 
 document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("reset-password-form");
+    const form = document.getElementById("change-password-form");
+
+    if (!form) {
+        console.error("Error: No se encontró el formulario. Verifica que el ID sea correcto en el HTML.");
+        return;
+    }
 
     form.addEventListener("submit", async function (event) {
         event.preventDefault();
@@ -14,6 +19,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const newPassword = document.getElementById("new-password").value;
         const confirmPassword = document.getElementById("confirm-password").value;
         const mensaje = document.getElementById("mensaje");
+
+        // Limpiar mensaje previo
+        mensaje.textContent = "";
+        mensaje.style.color = "black";
 
         // Validar que las contraseñas coincidan
         if (newPassword !== confirmPassword) {
@@ -31,9 +40,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
             // Cambiar la contraseña en Supabase
-            const { error } = await supabase.auth.updateUser({
-                password: newPassword
-            });
+            const { error } = await supabase.auth.api.updateUser(
+                accessToken,
+                { password: newPassword }
+            );
 
             if (error) {
                 mensaje.textContent = `❌ Error al cambiar la contraseña: ${error.message}`;
