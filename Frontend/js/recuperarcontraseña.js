@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             // Enviar solicitud de recuperación de contraseña con Supabase
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: "https://tu-dominio.com/restablecercontraseña.html"
+                redirectTo: "https://leximargimenez23.github.io/Digitalizaci-n-de-archivos/Frontend/cambiarcontrasena.html"
             });
 
             if (error) {
