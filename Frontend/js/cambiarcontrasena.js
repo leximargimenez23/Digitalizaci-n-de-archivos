@@ -2,6 +2,7 @@ import { supabase } from "./supabase.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
     const form = document.getElementById("change-password-form");
+    const mensaje = document.getElementById("mensaje");
 
     if (!form) {
         console.error("Error: No se encontró el formulario.");
@@ -13,7 +14,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const newPassword = document.getElementById("new-password").value;
         const confirmPassword = document.getElementById("confirm-password").value;
-        const mensaje = document.getElementById("mensaje");
 
         // Limpiar mensajes anteriores
         mensaje.textContent = "";
@@ -26,25 +26,23 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
 
+        // Obtener el parámetro "access_token" de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const access_token = urlParams.get('access_token');
+
+        if (!access_token) {
+            mensaje.textContent = "❌ Error: No se ha proporcionado un token válido.";
+            mensaje.style.color = "red";
+            return;
+        }
+
         try {
-            // Obtener la sesión actual
-            const { data: session, error: sessionError } = await supabase.auth.getSession();
-
-            // Verificar si la sesión es válida
-            if (sessionError || !session || !session.session) {
-                mensaje.textContent = "❌ Error: No hay sesión activa. Inicia sesión nuevamente.";
-                mensaje.style.color = "red";
-                // Redirigir al usuario a la página de login si la sesión no es válida
-                window.location.href = 'login.html'; 
-                return;
-            }
-
-            // Cambiar la contraseña usando el método correcto
-            const { error } = await supabase.auth.update({
+            // Restablecer la contraseña usando el token
+            const { error } = await supabase.auth.api.updateUser(access_token, {
                 password: newPassword
             });
 
-            // Verificar si hubo un error en el proceso de cambio de contraseña
+            // Verificar si hubo un error al cambiar la contraseña
             if (error) {
                 mensaje.textContent = `❌ Error al cambiar la contraseña: ${error.message}`;
                 mensaje.style.color = "red";
@@ -52,10 +50,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             // Si no hubo errores, informar al usuario
-            if (mensaje) {
-                mensaje.textContent = "✅ Contraseña cambiada exitosamente. Redirigiendo...";
-                mensaje.style.color = "green";
-            }
+            mensaje.textContent = "✅ Contraseña cambiada exitosamente. Redirigiendo...";
+            mensaje.style.color = "green";
 
             // Redirigir después de 3 segundos
             setTimeout(() => {
@@ -64,10 +60,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         } catch (err) {
             console.error("Error inesperado:", err);
-            if (mensaje) {
-                mensaje.textContent = `❌ Error inesperado: ${err.message}`;
-                mensaje.style.color = "red";
-            }
+            mensaje.textContent = `❌ Error inesperado: ${err.message}`;
+            mensaje.style.color = "red";
         }
     });
 });
