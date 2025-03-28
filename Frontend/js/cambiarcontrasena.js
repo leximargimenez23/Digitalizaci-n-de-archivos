@@ -1,15 +1,10 @@
-// Importar la biblioteca de Supabase
-import { supabase } from "./supabase.js"; // Asegúrate de que el archivo `supabase.js` está en la misma carpeta
+import { supabase } from "./supabase.js";
 
-// Obtener el `access_token` desde la URL (puede venir en `hash` o `search`)
-const urlParams = new URLSearchParams(window.location.search);
-const accessToken = urlParams.get("access_token");
-
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     const form = document.getElementById("change-password-form");
 
     if (!form) {
-        console.error("Error: No se encontró el formulario. Verifica que el ID sea correcto en el HTML.");
+        console.error("Error: No se encontró el formulario.");
         return;
     }
 
@@ -20,49 +15,59 @@ document.addEventListener("DOMContentLoaded", function () {
         const confirmPassword = document.getElementById("confirm-password").value;
         const mensaje = document.getElementById("mensaje");
 
-        // Limpiar mensaje previo
+        // Limpiar mensajes anteriores
         mensaje.textContent = "";
         mensaje.style.color = "black";
 
-        // Validar que las contraseñas coincidan
+        // Verificar que las contraseñas coincidan antes de cualquier otra operación
         if (newPassword !== confirmPassword) {
             mensaje.textContent = "❌ Las contraseñas no coinciden.";
             mensaje.style.color = "red";
             return;
         }
 
-        // Validar que el token esté presente
-        if (!accessToken) {
-            mensaje.textContent = "❌ Error: No se encontró un token válido.";
-            mensaje.style.color = "red";
-            return;
-        }
-
         try {
-            // Cambiar la contraseña en Supabase
-            const { error } = await supabase.auth.api.updateUser(
-                accessToken,
-                { password: newPassword }
-            );
+            // Obtener la sesión actual
+            const { data: session, error: sessionError } = await supabase.auth.getSession();
 
+            // Verificar si la sesión es válida
+            if (sessionError || !session || !session.session) {
+                mensaje.textContent = "❌ Error: No hay sesión activa. Inicia sesión nuevamente.";
+                mensaje.style.color = "red";
+                // Redirigir al usuario a la página de login si la sesión no es válida
+                window.location.href = 'login.html'; 
+                return;
+            }
+
+            // Cambiar la contraseña usando el método correcto
+            const { error } = await supabase.auth.update({
+                password: newPassword
+            });
+
+            // Verificar si hubo un error en el proceso de cambio de contraseña
             if (error) {
                 mensaje.textContent = `❌ Error al cambiar la contraseña: ${error.message}`;
                 mensaje.style.color = "red";
                 return;
             }
 
-            // Mensaje de éxito y redirección
-            mensaje.textContent = "✅ Contraseña cambiada exitosamente. Redirigiendo...";
-            mensaje.style.color = "green";
+            // Si no hubo errores, informar al usuario
+            if (mensaje) {
+                mensaje.textContent = "✅ Contraseña cambiada exitosamente. Redirigiendo...";
+                mensaje.style.color = "green";
+            }
 
+            // Redirigir después de 3 segundos
             setTimeout(() => {
-                window.location.href = "login.html"; // Redirige al login
+                window.location.href = "Frontend/login.html"; // Redirige al login
             }, 3000);
 
         } catch (err) {
             console.error("Error inesperado:", err);
-            mensaje.textContent = `❌ Error inesperado: ${err.message}`;
-            mensaje.style.color = "red";
+            if (mensaje) {
+                mensaje.textContent = `❌ Error inesperado: ${err.message}`;
+                mensaje.style.color = "red";
+            }
         }
     });
 });

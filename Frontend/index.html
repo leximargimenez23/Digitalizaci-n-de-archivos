@@ -13,6 +13,14 @@
     <div class="contenido">
         <h1>📁 Almacenamiento de Documentos</h1>
 
+        <!-- Contenedor del perfil (esquina superior derecha) -->
+<div id="profile-container">
+    <img id="profile-avatar" src="default-avatar.png" alt="Avatar" />
+    <span id="profile-name">Nombre de Usuario</span>
+    <button id="logout-button">Cerrar sesión</button>
+</div>
+
+
         <!-- Formulario para subir documentos -->
         <section id="subir-documento">
             <h2>📤 Subir Documento</h2>
@@ -63,7 +71,8 @@
         </section>
     </div>
     
-    <script src="js/script.js"></script>
+    <script type="module" src="js/script.js"></script>
+    <script type="module" src="js/perfil.js"></script>
     <script type="module" src="./supabase.js"></script>
 </body>
 </html>

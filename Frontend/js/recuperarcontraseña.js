@@ -1,39 +1,39 @@
 import { supabase } from "./supabase.js";
 
-document.addEventListener("DOMContentLoaded", function() {
-    const resetForm = document.getElementById("reset-form");
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("reset-form");
+    const emailInput = document.getElementById("email");
+    const statusMessage = document.createElement("p"); // Crear un mensaje de estado
+    form.appendChild(statusMessage); // Añadir el mensaje de estado al formulario
 
-    if (!resetForm) {
-        console.error("❌ No se encontró el formulario de recuperación.");
-        return;
-    }
-
-    resetForm.addEventListener("submit", async function(event) {
+    form.addEventListener("submit", async function (event) {
         event.preventDefault();
 
-        const emailInput = document.getElementById("email");
-        if (!emailInput) {
-            console.error("❌ No se encontró el campo de email.");
-            return;
-        }
-
         const email = emailInput.value.trim();
+
         if (!email) {
-            alert("⚠️ Por favor, ingresa tu correo electrónico.");
+            statusMessage.textContent = "❌ Por favor ingresa un correo electrónico válido.";
+            statusMessage.style.color = "red";
             return;
         }
 
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email);
+            // Enviar solicitud de recuperación de contraseña con Supabase
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: "https://tu-dominio.com/restablecercontraseña.html"
+            });
+
             if (error) {
-                console.error("❌ Error al enviar el correo:", error.message);
-                alert("Error: " + error.message);
-                return;
+                statusMessage.textContent = `❌ Error al enviar el correo: ${error.message}`;
+                statusMessage.style.color = "red";
+            } else {
+                statusMessage.textContent = "✅ Te hemos enviado un correo con instrucciones para restablecer tu contraseña.";
+                statusMessage.style.color = "green";
             }
-            alert("✅ Enlace de recuperación enviado. Revisa tu correo.");
         } catch (err) {
-            console.error("❌ Error inesperado:", err.message);
-            alert("Error inesperado: " + err.message);
+            console.error("Error inesperado:", err);
+            statusMessage.textContent = `❌ Error inesperado: ${err.message}`;
+            statusMessage.style.color = "red";
         }
     });
 });
