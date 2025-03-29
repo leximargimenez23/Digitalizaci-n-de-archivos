@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             // Enviar solicitud de recuperación de contraseña con Supabase
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: "https://leximargimenez23.github.io/Digitalizaci-n-de-archivos/Frontend/cambiarcontrasena.html"
+                redirectTo: "https://leximargimenez23.github.io/Digitalizaci-n-de-archivos/Frontend/cambiarcontrasena.html?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2JrZG5pZHpsdnN6eG9rYXNybW9sLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI0ODI0OWJkYy05MzQ4LTQzZjgtOThkZi00NTY4YmY4Nzg3YmMiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQyOTM0NTIxLCJpYXQiOjE3NDI5MzA5MjEsImVtYWlsIjoibGV4aW1hcmdpbWVuZXpAZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YXRhY3QiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbCI6ImxleGltYXJnaW1lbmV6QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaG9uZV92ZXJpZmllZCI6ZmFsc2UsInN1YiI6IjQ4MjQ5YmRjLTkzNDgtNDNmOC05OGRmLTQ1NjhiZjg3ODdiYyJ9.FfXHBlAi3SPdmEbNReitK6mIVq0GRfLkX-ktGN1hI4o"
             });
 
             if (error) {
