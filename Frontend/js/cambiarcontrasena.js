@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         try {
             // Restablecer la contraseña usando el token
-            const { error } = await supabase.auth.api.updateU(access_token, {
+            const { error } = await supabase.auth.api.update(access_token, {
                 password: newPassword
             });
 
