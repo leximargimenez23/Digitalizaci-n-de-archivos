@@ -1,8 +1,8 @@
 import { supabase } from "./supabase.js";
 import { generarResumen, extraerPalabrasClave } from "./gemini.js";
 
-import pdfParse from "pdf-parse";
-import mammoth from "mammoth";
+
+
 
 async function extraerTexto(file) {
     return new Promise((resolve, reject) => {
@@ -10,7 +10,7 @@ async function extraerTexto(file) {
 
         reader.onload = async (event) => {
             const fileType = file.type;
-            console.log("Tipo de archivo detectado:", fileType); // 🔹 Verificar tipo de archivo
+            console.log("Tipo de archivo detectado:", fileType);
 
             try {
                 if (fileType === "text/plain") {
@@ -18,9 +18,19 @@ async function extraerTexto(file) {
                     resolve(event.target.result);
                 } else if (fileType === "application/pdf") {
                     console.log("Leyendo archivo PDF...");
-                    const pdfData = await pdfParse(event.target.result);
-                    console.log("Texto extraído del PDF:", pdfData.text);
-                    resolve(pdfData.text);
+                    
+                    // Usar pdf.js para extraer texto
+                    const pdfData = new Uint8Array(event.target.result);
+                    const pdfDoc = await pdfjsLib.getDocument(pdfData).promise;
+                    let texto = '';
+
+                    for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+                        const page = await pdfDoc.getPage(pageNum);
+                        const content = await page.getTextContent();
+                        texto += content.items.map(item => item.str).join(' ') + '\n';
+                    }
+                    console.log("Texto extraído del PDF:", texto);
+                    resolve(texto);
                 } else if (fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
                     console.log("Leyendo archivo Word...");
                     const { value } = await mammoth.extractRawText({ arrayBuffer: event.target.result });
@@ -43,6 +53,7 @@ async function extraerTexto(file) {
         }
     });
 }
+
 
 
 
