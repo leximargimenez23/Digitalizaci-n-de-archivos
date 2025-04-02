@@ -1,15 +1,50 @@
 import { supabase } from "./supabase.js";
 import { generarResumen, extraerPalabrasClave } from "./gemini.js";
 
-// Función para extraer texto de un archivo
+import pdfParse from "pdf-parse";
+import mammoth from "mammoth";
+
 async function extraerTexto(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = (event) => resolve(event.target.result);
+
+        reader.onload = async (event) => {
+            const fileType = file.type;
+            console.log("Tipo de archivo detectado:", fileType); // 🔹 Verificar tipo de archivo
+
+            try {
+                if (fileType === "text/plain") {
+                    console.log("Leyendo archivo de texto...");
+                    resolve(event.target.result);
+                } else if (fileType === "application/pdf") {
+                    console.log("Leyendo archivo PDF...");
+                    const pdfData = await pdfParse(event.target.result);
+                    console.log("Texto extraído del PDF:", pdfData.text);
+                    resolve(pdfData.text);
+                } else if (fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+                    console.log("Leyendo archivo Word...");
+                    const { value } = await mammoth.extractRawText({ arrayBuffer: event.target.result });
+                    console.log("Texto extraído del Word:", value);
+                    resolve(value);
+                } else {
+                    reject("Formato de archivo no soportado.");
+                }
+            } catch (error) {
+                reject("Error al leer el archivo: " + error.message);
+            }
+        };
+
         reader.onerror = (error) => reject(error);
-        reader.readAsText(file); // Leer archivo como texto
+
+        if (file.type === "application/pdf" || file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+            reader.readAsArrayBuffer(file);
+        } else {
+            reader.readAsText(file);
+        }
     });
 }
+
+
 
 // Función para subir el archivo
 async function subirArchivo() {
@@ -30,25 +65,39 @@ async function subirArchivo() {
     }
 
     const filePath = `uploads/${file.name}`;
+    console.log("Iniciando subida del archivo:", file.name); // 🔹 Verificar archivo seleccionado
 
     // Subir archivo a Supabase Storage
     const { data, error } = await supabase.storage.from("documentos").upload(filePath, file);
 
     if (error) {
+        console.error("Error al subir archivo a Supabase:", error); // 🔹 Imprimir error en la consola
         alert("Error al subir archivo: " + error.message);
         return;
     }
+    console.log("Archivo subido correctamente:", data);
 
     // Generar la URL del archivo
     const fileUrl = `https://bkdnidzlvszxokasrmol.supabase.co/storage/v1/object/public/documentos/${filePath}`;
+    console.log("URL del archivo:", fileUrl); // 🔹 Verificar la URL
 
     // Extraer texto del archivo
-    let contenidoTexto = await extraerTexto(file);
+    let contenidoTexto;
+    try {
+        contenidoTexto = await extraerTexto(file);
+        console.log("Texto extraído del archivo:", contenidoTexto); // 🔹 Imprimir el texto extraído
+    } catch (err) {
+        console.error("Error al extraer texto:", err);
+        alert("No se pudo extraer texto del archivo.");
+        return;
+    }
 
     // Generar resumen y palabras clave con IA
     const resumen = await generarResumen(contenidoTexto);
     const palabrasClave = await extraerPalabrasClave(contenidoTexto) || ["Sin palabras clave"];
 
+    console.log("Resumen generado:", resumen); // 🔹 Verificar el resumen generado
+    console.log("Palabras clave:", palabrasClave); // 🔹 Verificar palabras clave
 
     // Guardar en la base de datos
     const { error: dbError } = await supabase.from("documentos_meta").insert([
@@ -63,6 +112,7 @@ async function subirArchivo() {
     ]);
 
     if (dbError) {
+        console.error("Error al guardar en la base de datos:", dbError);
         alert("Error al guardar en la base de datos: " + dbError.message);
     } else {
         alert("Documento subido exitosamente!");
