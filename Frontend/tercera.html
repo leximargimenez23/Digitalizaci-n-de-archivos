@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Archivo</title>
+    <link rel="stylesheet" href="CSS/estiloprimera.css">
+</head>
+<body>
+
+    <!-- Menú lateral -->
+    <div id="menuContainer"></div>
+
+    <!-- Contenido principal -->
+    <div class="contenido">
+        <h2>Subir Archivo</h2>
+        
+        <!-- Input para seleccionar archivo -->
+        <input type="file" id="fileInput">
+        <button class="boton" onclick="subirArchivo()">Subir Archivo</button>
+
+        <!-- Mensaje de éxito o error -->
+        <div id="mensaje"></div>
+
+        <!-- Lista de archivos subidos -->
+        <h3>Archivos Subidos</h3>
+        <button class="boton" onclick="listarArchivos()">Ver Archivos</button>
+        <ul id="listaArchivos"></ul>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

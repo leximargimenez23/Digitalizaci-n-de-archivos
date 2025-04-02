@@ -13,20 +13,35 @@
 
     <!-- Contenido principal -->
     <div class="contenido">
-        <a href="Segunda.html">
-        <button class="boton" type="submit">
-            <span>Tomar Foto</span>
-            <img src="imagenes/camara.png" alt="camara">
-        </button>
-        </a>
+        
+        <div class="boton">
+            
+            <label for="fileInput" class="custom-file-upload">Subir Documentos</label>
+            <input type="file" id="fileInput">
+            <span id="file-name" style="display: none;">Ningún archivo seleccionado</span>
+           
+            <p id="mensaje"></p>
+        
+            <img class="imgsubir" src="imagenes/camara.png" alt="camara">
+            <button id="btnSubir">Subir</button>
+
+            
+        </div>
+    
+        <ul id="listaArchivos"></ul>
+
+    
+
+
         <a href="tercera.html">
         <button class="boton">
-            <span>Subir Archivo</span>
+            <label>Subir Archivo</label>
             <img src="imagenes/subir.png" alt="Subir">
         </button>
         </a>
     </div>
 
-    <script src="js/script.js"></script>
+    
+    <script type="module" src="js/primera.js" defer></script>
 </body>
 </html>

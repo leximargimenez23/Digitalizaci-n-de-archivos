@@ -81,7 +81,7 @@ body {
     text-align: center;
 }
 
-.boton span {
+.boton label {
     position: relative;
     top: -40px; /* Mueve el texto hacia arriba */
     margin-bottom: 10px;
@@ -90,10 +90,48 @@ body {
 .boton img {
     width: 70px; /* Ajusta el tamaño de la imagen */
     height: auto;
+    
 }
 
-a {
-    text-decoration: none;
-  }
+.boton .imgsubir {
+    width: 150px; /* Ajusta el tamaño de la imagen */
+    height: auto;
+    margin-top: -100px;
+}
 
+.boton button{
+    padding: 10px;
+    width: 200px;
+    margin-top: 60px;
+    background-color: #A9A9A9;
+    
+}
 
+.boton button:hover{
+    background-color: #8b8585;
+}
+
+input{
+    margin-top: 20px;
+   
+}
+
+#fileInput {
+    display: none;
+}
+
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 50px;
+    font-size: 30px;
+    color: white;
+    background-color: #666;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    text-align: center;
+}
+
+.custom-file-upload:hover {
+    background-color: #494444;
+}
