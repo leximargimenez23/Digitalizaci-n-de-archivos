@@ -4,12 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subir Documento</title>
+    <link rel="stylesheet" href="CSS/perfilavatar.css">
     <link rel="stylesheet" href="CSS/estilosegunda.css">
+    <link rel="stylesheet" href="CSS/menu.css">
+    
 </head>
 <body>
 
-    <!-- Menú lateral -->
     <div id="menuContainer"></div>
+
+     <!-- Contenedor del perfil (esquina superior derecha) -->
+<div id="profile-container">
+    <img id="profile-avatar" src="default-avatar.png" alt="Avatar" />
+    <span id="profile-name">Nombre de Usuario</span>
+    <button id="logout-button">Cerrar sesión</button>
+</div>
 
     <div class="container">
         <div class="preview-section">
@@ -20,32 +29,37 @@
         </div>
 
         <div class="form-section">
+            <label for="fileInput">Seleccionar Archivo</label>
+            <input type="file" id="fileInput">
+
             <label for="file-name">Nombre del Archivo</label>
             <input type="text" id="file-name" placeholder="Ingrese el nombre del archivo">
 
-
-            <label for="file-format">Guardar como</label>
+            <label for="file-format">Tipo de Documento</label>
             <select id="file-format">
-                <option>PDF</option>
-                <option>DOCX</option>
-                <option>TXT</option>
-                <option>PNG</option>
-                <option>JPG</option>
+                <option>Financiero</option>
+                <option>Inventario</option>
+                <option>Reuniones</option>
+                <option>Contrato</option>
+                <option>Otros</option>
             </select>
+
+            <button id="btnSubir">Subir Documento</button>
         </div>
 
         <div class="summary-section">
             <h3>Resumen generado con IA</h3>
             <div class="summary-box">
-                
                 <div id="summary-text" contenteditable="true" class="editable-box">
-                    Las patatas son <strong>tubérculos comestibles</strong> que pertenecen a la familia de las solanáceas. Son ricas en nutrientes como el potasio y la vitamina C, y tienen muchos beneficios para la salud.
+                    El resumen aparecerá aquí...
                 </div>
             </div>
-            
         </div>
     </div>
-
-    <script src="js/script.js"></script>
+    <ul id="listaArchivos"></ul>
+    <script type="module" src="js/gemini.js"></script>
+    <script type="module" src="js/perfil.js"></script>
+    <script type="module" src="js/primera.js"></script>
+    <script type="module" src="js/script.js"></script>
 </body>
 </html>

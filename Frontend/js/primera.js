@@ -1,32 +1,78 @@
-// Importar la configuración de Supabase
 import { supabase } from "./supabase.js";
+import { generarResumen, extraerPalabrasClave } from "./gemini.js";
 
-// Función para subir archivos a Supabase Storage
+// Función para extraer texto de un archivo
+async function extraerTexto(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => resolve(event.target.result);
+        reader.onerror = (error) => reject(error);
+        reader.readAsText(file); // Leer archivo como texto
+    });
+}
+
+// Función para subir el archivo
 async function subirArchivo() {
     const fileInput = document.getElementById("fileInput");
+    const fileNameInput = document.getElementById("file-name").value;
+    const fileFormat = document.getElementById("file-format").value;
+
     const file = fileInput.files[0];
 
     if (!file) {
-        document.getElementById("mensaje").innerText = "Selecciona un archivo.";
+        alert("Selecciona un archivo para subir.");
         return;
     }
 
-    // Subir archivo a Supabase Storage
-    const fileName = encodeURIComponent(file.name); // Convierte el nombre del archivo a un formato seguro para URL
+    if (!fileNameInput.trim()) {
+        alert("Ingresa un nombre para el archivo.");
+        return;
+    }
 
-    const { data, error } = await supabase.storage.from('documentos').upload(`uploads/${fileName}`, file);
+    const filePath = `uploads/${file.name}`;
+
+    // Subir archivo a Supabase Storage
+    const { data, error } = await supabase.storage.from("documentos").upload(filePath, file);
 
     if (error) {
-        document.getElementById("mensaje").innerText = "Error al subir archivo: " + error.message;
+        alert("Error al subir archivo: " + error.message);
+        return;
+    }
+
+    // Generar la URL del archivo
+    const fileUrl = `https://bkdnidzlvszxokasrmol.supabase.co/storage/v1/object/public/documentos/${filePath}`;
+
+    // Extraer texto del archivo
+    let contenidoTexto = await extraerTexto(file);
+
+    // Generar resumen y palabras clave con IA
+    const resumen = await generarResumen(contenidoTexto);
+    const palabrasClave = await extraerPalabrasClave(contenidoTexto) || ["Sin palabras clave"];
+
+
+    // Guardar en la base de datos
+    const { error: dbError } = await supabase.from("documentos_meta").insert([
+        {
+            nombre: fileNameInput,
+            tipo: fileFormat,
+            url: fileUrl,
+            resumen: resumen,
+            palabras_clave: palabrasClave // Directamente como array de strings
+
+        }
+    ]);
+
+    if (dbError) {
+        alert("Error al guardar en la base de datos: " + dbError.message);
     } else {
-        document.getElementById("mensaje").innerText = "Archivo subido con éxito: " + data.path;
-        listarArchivos(); // Actualizar la lista de archivos subidos
+        alert("Documento subido exitosamente!");
+        document.getElementById("summary-text").innerText = resumen; // Mostrar resumen en la interfaz
     }
 }
 
 // Función para listar archivos subidos
 async function listarArchivos() {
-    const { data, error } = await supabase.storage.from('documentos').list('uploads');
+    const { data, error } = await supabase.storage.from("documentos").list("uploads");
 
     if (error) {
         console.error("Error al listar archivos:", error);
@@ -36,25 +82,11 @@ async function listarArchivos() {
     const lista = document.getElementById("listaArchivos");
     lista.innerHTML = "";
 
-    data.forEach(file => {
+    data.forEach((file) => {
         const li = document.createElement("li");
-        // Crear enlace a la URL pública del archivo
         li.innerHTML = `<a href="https://bkdnidzlvszxokasrmol.supabase.co/storage/v1/object/public/documentos/uploads/${file.name}" target="_blank">${file.name}</a>`;
         lista.appendChild(li);
     });
 }
 
-// Mostrar el nombre del archivo seleccionado en el input
-document.getElementById("fileInput").addEventListener("change", function() {
-    let fileNameElement = document.getElementById("file-name");
-
-    if (this.files.length > 0) {
-        fileNameElement.textContent = this.files[0].name;
-        fileNameElement.style.display = "inline"; // Mostrar cuando hay archivo
-    } else {
-        fileNameElement.style.display = "none"; // Ocultar si no hay archivo
-    }
-});
-
-// Asignar el evento de clic al botón de subir
 document.getElementById("btnSubir").addEventListener("click", subirArchivo);

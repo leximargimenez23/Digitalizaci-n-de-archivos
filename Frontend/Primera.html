@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página Principal</title>
+    <link rel="stylesheet" href="CSS/perfilavatar.css">
     <link rel="stylesheet" href="CSS/estiloprimera.css">
 </head>
 <body>
@@ -11,37 +12,35 @@
      <!-- Menú lateral -->
     <div id="menuContainer"></div>
 
+    <!-- Contenedor del perfil (esquina superior derecha) -->
+<div id="profile-container">
+    <img id="profile-avatar" src="default-avatar.png" alt="Avatar" />
+    <span id="profile-name">Nombre de Usuario</span>
+    <button id="logout-button">Cerrar sesión</button>
+</div>
+
     <!-- Contenido principal -->
     <div class="contenido">
-        
-        <div class="boton">
-            
-            <label for="fileInput" class="custom-file-upload">Subir Documentos</label>
-            <input type="file" id="fileInput">
-            <span id="file-name" style="display: none;">Ningún archivo seleccionado</span>
-           
-            <p id="mensaje"></p>
-        
-            <img class="imgsubir" src="imagenes/camara.png" alt="camara">
-            <button id="btnSubir">Subir</button>
-
-            
-        </div>
-    
-        <ul id="listaArchivos"></ul>
-
-    
-
-
+        <a href="Segunda.html">
+        <button class="boton" type="submit">
+            <span>Subir Documentos</span>
+            <img src="imagenes/camara.png" alt="camara">
+        </button>
+        </a>
         <a href="tercera.html">
         <button class="boton">
-            <label>Subir Archivo</label>
+            <span>Ver Documentos</span>
             <img src="imagenes/subir.png" alt="Subir">
         </button>
         </a>
     </div>
 
+    <script src="js/script.js"></script>
+</body>
+</html>
+
     
     <script type="module" src="js/primera.js" defer></script>
+    <script type="module" src="js/perfil.js"></script>
 </body>
 </html>
