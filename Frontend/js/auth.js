@@ -27,8 +27,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 const user = await registerUser(email, password);
                 if (!user) throw new Error("No se pudo registrar el usuario.");
 
-                // 🔹 Crear perfil en la tabla `perfiles`
-                await createUserProfile(user.id, nombre);
+                // 🔹 Crear perfil en la tabla `perfiles` (sin interrumpir si falla)
+                try {
+                    await createUserProfile(user.id, nombre);
+                } catch (errorPerfil) {
+                    console.warn("⚠️ Perfil no creado en este momento:", errorPerfil.message);
+                }
 
                 alert("✅ Registro exitoso. Verifica tu correo electrónico.");
                 window.location.href = "login.html";
@@ -79,4 +83,3 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
-
