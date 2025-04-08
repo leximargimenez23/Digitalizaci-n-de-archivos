@@ -38,4 +38,4 @@ export async function logoutUser() {
     if (error) throw new Error(error.message);
 }
 
-
+window.supabase = supabase;

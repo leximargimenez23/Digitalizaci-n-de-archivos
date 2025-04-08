@@ -3,40 +3,25 @@ import { supabase } from "./supabase.js";
 
 // Función principal que se encarga de buscar documentos según filtros aplicados
 export async function buscarDocumentos() {
-  // Obtenemos el valor ingresado en el campo de búsqueda
   const palabraClave = document.getElementById("input-busqueda").value.trim().toLowerCase();
-
-  // Obtenemos el tipo de documento seleccionado
   const tipoSeleccionado = document.getElementById("select-tipo").value;
-
-  // Obtenemos el orden de fecha (ascendente o descendente)
   const orden = document.getElementById("orden-fecha").value;
 
-  // Inicializamos una consulta a la tabla "documentos_meta"
   let query = supabase.from("documentos_meta").select("*");
 
-  // Si se seleccionó un tipo de documento, agregamos el filtro
   if (tipoSeleccionado) {
     query = query.eq("tipo", tipoSeleccionado);
   }
 
-  // Ordenamos los resultados por fecha de creación
-  if (orden === "asc") {
-    query = query.order("created_at", { ascending: true });
-  } else {
-    query = query.order("created_at", { ascending: false });
-  }
+  query = query.order("created_at", { ascending: orden === "asc" });
 
-  // Ejecutamos la consulta
   const { data, error } = await query;
 
-  // Si hay un error, lo mostramos por consola y detenemos la ejecución
   if (error) {
-    console.error("Error al consultar Supabase:", error);
+    console.error("❌ Error al consultar Supabase:", error);
     return;
   }
 
-  // Si se ingresó una palabra clave, filtramos los documentos localmente
   const resultados = palabraClave
     ? data.filter(doc =>
         (doc.palabras_clave || []).some(p =>
@@ -45,25 +30,20 @@ export async function buscarDocumentos() {
       )
     : data;
 
-  // Mostramos los resultados filtrados
   mostrarResultados(resultados);
 }
 
 // Función que se encarga de mostrar los resultados en el HTML
 function mostrarResultados(documentos) {
-  // Obtenemos la lista y el contador de resultados
   const lista = document.getElementById("lista-documentos");
   const cantidad = document.getElementById("cantidad-resultados");
 
-  // Limpiamos el contenido anterior
   lista.innerHTML = "";
   cantidad.textContent = `Se encontraron ${documentos.length} documento(s).`;
 
-  // Recorremos cada documento y lo insertamos en la lista
   documentos.forEach(doc => {
     const li = document.createElement("li");
 
-    // Creamos el contenido del documento con resumen y botón para mostrarlo
     li.innerHTML = `
       <strong>${doc.nombre}</strong> - <em>${doc.tipo}</em><br>
       <a href="${doc.url}" target="_blank">Ver documento</a><br>
@@ -73,10 +53,20 @@ function mostrarResultados(documentos) {
         <p><strong>Resumen:</strong> ${doc.resumen || "No disponible"}</p>
       </div>
 
-      <small><strong>Palabras clave:</strong> ${doc.palabras_clave?.join(", ") || "Ninguna"}</small>
+      <small><strong>Palabras clave:</strong> ${doc.palabras_clave?.join(", ") || "Ninguna"}</small><br>
+
+      <button class="btn-eliminar" data-id="${doc.id}" style="margin-top: 8px; color: red;">🗑 Eliminar</button>
+      <button class="btn-editar" data-id="${doc.id}" style="margin-top: 8px; color: blue;">✏️ Editar</button>
+
+      <div class="form-edicion" style="display:none; margin-top:10px;">
+        <input type="text" placeholder="Nombre" value="${doc.nombre}" class="input-nombre" style="width:100%; margin-top:4px;" />
+        <input type="text" placeholder="Tipo" value="${doc.tipo}" class="input-tipo" style="width:100%; margin-top:4px;" />
+        <textarea placeholder="Resumen" class="input-resumen" style="width:100%; margin-top:4px;">${doc.resumen || ""}</textarea>
+        <button class="btn-guardar-cambios" style="margin-top:4px;">💾 Guardar cambios</button>
+      </div>
     `;
 
-    // Agregamos funcionalidad al botón para mostrar/ocultar el resumen
+    // Mostrar / ocultar resumen
     const btnResumen = li.querySelector(".btn-toggle-resumen");
     const resumenDiv = li.querySelector(".resumen");
 
@@ -86,9 +76,97 @@ function mostrarResultados(documentos) {
       btnResumen.textContent = visible ? "Ver resumen" : "Ocultar resumen";
     });
 
-    // Agregamos el elemento a la lista
+    // Evento para eliminar documento
+    const btnEliminar = li.querySelector(".btn-eliminar");
+    btnEliminar.addEventListener("click", async () => {
+      const confirmacion = confirm("¿Estás seguro de que deseas eliminar este documento?");
+      if (confirmacion) {
+        await eliminarDocumento(doc.id);
+        await buscarDocumentos();
+      }
+    });
+
+    // Mostrar formulario de edición
+    const btnEditar = li.querySelector(".btn-editar");
+    const formEdicion = li.querySelector(".form-edicion");
+
+    btnEditar.addEventListener("click", () => {
+      formEdicion.style.display = formEdicion.style.display === "block" ? "none" : "block";
+    });
+
+    // Guardar cambios
+    const btnGuardar = li.querySelector(".btn-guardar-cambios");
+    btnGuardar.addEventListener("click", async () => {
+      const nuevoNombre = li.querySelector(".input-nombre").value.trim();
+      const nuevoTipo = li.querySelector(".input-tipo").value.trim();
+      const nuevoResumen = li.querySelector(".input-resumen").value.trim();
+
+      const { error } = await supabase
+        .from("documentos_meta")
+        .update({
+          nombre: nuevoNombre,
+          tipo: nuevoTipo,
+          resumen: nuevoResumen
+        })
+        .eq("id", doc.id);
+
+      if (error) {
+        console.error("❌ Error al actualizar:", error);
+        alert("Hubo un problema al actualizar el documento.");
+      } else {
+        alert("✅ Documento actualizado correctamente.");
+        await buscarDocumentos(); // recarga actualizada
+      }
+    });
+
     lista.appendChild(li);
   });
+}
+
+// Función para eliminar un documento de la base de datos y del storage
+async function eliminarDocumento(id) {
+  console.log("🗑 Intentando eliminar documento con ID:", id);
+
+  const { data: doc, error: fetchError } = await supabase
+    .from("documentos_meta")
+    .select("url")
+    .eq("id", id)
+    .single();
+
+  if (fetchError || !doc) {
+    console.error("❌ Error al obtener el documento:", fetchError);
+    return;
+  }
+
+  const url = doc.url;
+  const partes = url.split("/public/documentos/");
+  if (partes.length < 2) {
+    console.error("❌ No se pudo extraer el path del Storage desde la URL.");
+    return;
+  }
+
+  const path = decodeURIComponent(partes[1]);
+
+  const { error: storageError } = await supabase.storage
+    .from("documentos")
+    .remove([path]);
+
+  if (storageError) {
+    console.error("❌ Error al eliminar del Storage:", storageError);
+  } else {
+    console.log("✅ Archivo eliminado del Storage correctamente.");
+  }
+
+  const { error: dbError } = await supabase
+    .from("documentos_meta")
+    .delete()
+    .eq("id", id);
+
+  if (dbError) {
+    console.error("❌ Error al eliminar de la base de datos:", dbError);
+  } else {
+    console.log("✅ Documento eliminado de la base de datos.");
+  }
 }
 
 // Función para limpiar los filtros y recargar todos los documentos
@@ -99,13 +177,34 @@ export function limpiarFiltros() {
   buscarDocumentos();
 }
 
+async function cargarTiposDocumento() {
+  const { data, error } = await supabase
+    .from("documentos_meta")
+    .select("tipo");
+
+  if (error) {
+    console.error("❌ Error al cargar tipos de documentos:", error);
+    return;
+  }
+
+  const tiposUnicos = [...new Set(data.map(doc => doc.tipo).filter(Boolean))];
+  const select = document.getElementById("select-tipo");
+
+  // Limpiar y agregar opción por defecto
+  select.innerHTML = `<option value="">Todos</option>`;
+  tiposUnicos.forEach(tipo => {
+    const option = document.createElement("option");
+    option.value = tipo;
+    option.textContent = tipo;
+    select.appendChild(option);
+  });
+}
+
 // Al cargar la página, ejecutamos la búsqueda y asignamos eventos a los botones
 window.addEventListener("DOMContentLoaded", () => {
-  buscarDocumentos(); // Búsqueda inicial
+  cargarTiposDocumento(); // ✅ <- esto carga los tipos
+  buscarDocumentos();
 
-  // Botón de búsqueda
   document.getElementById("btn-buscar").addEventListener("click", buscarDocumentos);
-
-  // Botón de limpiar filtros
   document.getElementById("btn-limpiar").addEventListener("click", limpiarFiltros);
 });
