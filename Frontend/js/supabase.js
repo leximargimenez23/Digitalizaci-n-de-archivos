@@ -20,7 +20,7 @@ export async function createUserProfile(userId, nombre) {
 
     if (error) {
         console.error("Error al crear perfil:", error.message);
-        return null; // No lanzamos el error para no interrumpir el registro
+        throw new Error(error.message);
     }
     return data;
 }
@@ -38,4 +38,4 @@ export async function logoutUser() {
     if (error) throw new Error(error.message);
 }
 
-
+window.supabase = supabase;
