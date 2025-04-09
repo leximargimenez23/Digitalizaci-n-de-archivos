@@ -1,13 +1,30 @@
 // Importamos la configuración de Supabase desde un archivo externo
 import { supabase } from "./supabase.js";
 
-// Función principal que se encarga de buscar documentos según filtros aplicados
 export async function buscarDocumentos() {
   const palabraClave = document.getElementById("input-busqueda").value.trim().toLowerCase();
   const tipoSeleccionado = document.getElementById("select-tipo").value;
   const orden = document.getElementById("orden-fecha").value;
 
-  let query = supabase.from("documentos_meta").select("*");
+  // Obtener sesión actual
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  console.log("Session data:", sessionData);
+
+  if (sessionError || !sessionData || !sessionData.session) {
+    console.error("❌ Error al obtener la sesión o no hay sesión activa:", sessionError);
+    return;
+  }
+
+  const usuario = sessionData.session.user;
+
+  if (!usuario || !usuario.id) {
+    console.error("❌ El usuario no está definido o su ID está vacío");
+    return;
+  }
+
+  console.log("✅ Usuario autenticado, ID:", usuario.id);
+
+  let query = supabase.from("documentos_meta").select("*").eq("user_id", usuario.id);
 
   if (tipoSeleccionado) {
     query = query.eq("tipo", tipoSeleccionado);
@@ -32,8 +49,6 @@ export async function buscarDocumentos() {
 
   mostrarResultados(resultados);
 }
-
-// Función que se encarga de mostrar los resultados en el HTML
 function mostrarResultados(documentos) {
   const lista = document.getElementById("lista-documentos");
   const cantidad = document.getElementById("cantidad-resultados");
@@ -44,16 +59,24 @@ function mostrarResultados(documentos) {
   documentos.forEach(doc => {
     const li = document.createElement("li");
 
+    // Palabras clave iniciales (máximo 3)
+    const palabrasClave = doc.palabras_clave || [];
+    const primerasPalabras = palabrasClave.slice(0, 3).join(", ");
+    const todasPalabras = palabrasClave.join(", ");
+
     li.innerHTML = `
       <strong>${doc.nombre}</strong> - <em>${doc.tipo}</em><br>
       <a href="${doc.url}" target="_blank">Ver documento</a><br>
 
       <button class="btn-toggle-resumen">Ver resumen</button>
       <div class="resumen" style="display: none; margin-top: 5px;">
-        <p><strong>Resumen:</strong> ${doc.resumen || "No disponible"}</p>
+        <p style="color: black;"><strong>Resumen:</strong> ${doc.resumen || "No disponible"}</p>
       </div>
 
-      <small><strong>Palabras clave:</strong> ${doc.palabras_clave?.join(", ") || "Ninguna"}</small><br>
+      <div class="palabras-clave" style="margin-top: 5px;">
+        <small><strong>Palabras clave:</strong> <span class="vista-palabras" style="color: black;">${primerasPalabras || "Ninguna"}</span></small>
+        ${palabrasClave.length > 3 ? `<button class="btn-toggle-palabras" style="margin-left: 8px;">Ver todas</button>` : ""}
+      </div>
 
       <button class="btn-eliminar" data-id="${doc.id}" style="margin-top: 8px; color: red;">🗑 Eliminar</button>
       <button class="btn-editar" data-id="${doc.id}" style="margin-top: 8px; color: blue;">✏️ Editar</button>
@@ -75,6 +98,20 @@ function mostrarResultados(documentos) {
       resumenDiv.style.display = visible ? "none" : "block";
       btnResumen.textContent = visible ? "Ver resumen" : "Ocultar resumen";
     });
+
+    // Mostrar / ocultar palabras clave completas
+    const btnPalabras = li.querySelector(".btn-toggle-palabras");
+    const vistaPalabras = li.querySelector(".vista-palabras");
+
+    if (btnPalabras) {
+      let mostrandoTodas = false;
+
+      btnPalabras.addEventListener("click", () => {
+        mostrandoTodas = !mostrandoTodas;
+        vistaPalabras.textContent = mostrandoTodas ? todasPalabras : primerasPalabras;
+        btnPalabras.textContent = mostrandoTodas ? "Ocultar" : "Ver todas";
+      });
+    }
 
     // Evento para eliminar documento
     const btnEliminar = li.querySelector(".btn-eliminar");
@@ -122,6 +159,7 @@ function mostrarResultados(documentos) {
     lista.appendChild(li);
   });
 }
+
 
 // Función para eliminar un documento de la base de datos y del storage
 async function eliminarDocumento(id) {

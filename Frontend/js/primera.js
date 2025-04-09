@@ -122,6 +122,12 @@ async function extraerTexto(file) {
     });
 }
 
+// Función para normalizar el nombre del archivo
+function normalizarNombreArchivo(nombre) {
+    return nombre.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_').toLowerCase();
+}
+
+
 // 📤 Subir archivo, generar resumen, guardar en Supabase
 async function subirArchivo() {
     const fileInput = document.getElementById("fileInput");// Obtener el input de archivo
@@ -143,9 +149,14 @@ async function subirArchivo() {
 
     // Deshabilitar el botón mientras se realiza la subida
     btnSubir.disabled = true;
-    const filePath = `uploads/${file.name}`; // Definir la ruta del archivo en Supabase
-    console.log("Iniciando subida del archivo:", file.name);
 
+
+        // Normalizar el nombre del archivo
+        const nombreArchivoNormalizado = normalizarNombreArchivo(fileNameInput);
+
+        const filePath = `uploads/${nombreArchivoNormalizado}`; // Usamos el nombre normalizado para la ruta
+        console.log("Iniciando subida del archivo:", file.name);
+    
     // Subir el archivo a Supabase
     const { data, error } = await supabase.storage.from("documentos").upload(filePath, file);
     if (error) {
@@ -177,13 +188,22 @@ async function subirArchivo() {
     console.log("Resumen generado:", resumen);
     console.log("Palabras clave:", palabrasClave);
 
-    // Guardar la información del documento en la base de datos de Supabase
+    // 👉 Obtener el ID del usuario actual
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        alert("No se pudo obtener el usuario.");
+        btnSubir.disabled = false;
+        return;
+    }
+
+    // 👇 Guardar en la base de datos con el ID del usuario
     const { error: dbError } = await supabase.from("documentos_meta").insert([{
         nombre: fileNameInput,
         tipo: fileFormat,
         url: fileUrl,
         resumen: resumen,
-        palabras_clave: palabrasClave
+        palabras_clave: palabrasClave,
+        user_id: user.id  // 👈 clave aquí
     }]);
 
     if (dbError) {
@@ -191,29 +211,45 @@ async function subirArchivo() {
         alert("Error al guardar en la base de datos: " + dbError.message);
     } else {
         alert("Documento subido exitosamente!");
-        document.getElementById("summary-text").innerText = resumen;// Mostrar resumen en la interfaz
+        document.getElementById("summary-text").innerText = resumen;
     }
 
-    btnSubir.disabled = false;// Habilitar el botón nuevamente
+    btnSubir.disabled = false;
 }
 
 // Función para listar los archivos almacenados en Supabase
 async function listarArchivos() {
-    const { data, error } = await supabase.storage.from("documentos").list("uploads");
+    const lista = document.getElementById("listaArchivos");
+    lista.innerHTML = "";
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+        console.error("No se pudo obtener el usuario actual:", userError?.message);
+        return;
+    }
+
+    // 🔒 Obtener solo documentos del usuario actual
+    const { data, error } = await supabase
+        .from("documentos_meta")
+        .select("*")
+        .eq("user_id", user.id);
+
     if (error) {
         console.error("Error al listar archivos:", error);
         return;
     }
 
-    const lista = document.getElementById("listaArchivos");// Obtener el elemento donde se mostrarán los archivos
-    lista.innerHTML = "";// Limpiar la lista de archivos
-    // Iterar sobre los archivos y agregar un enlace a cada uno
-    data.forEach((file) => {
+    data.forEach((doc) => {
         const li = document.createElement("li");
-        li.innerHTML = `<a href="https://bkdnidzlvszxokasrmol.supabase.co/storage/v1/object/public/documentos/uploads/${file.name}" target="_blank">${file.name}</a>`;
-        lista.appendChild(li);// Añadir cada archivo a la lista
+        li.innerHTML = `<a href="${doc.url}" target="_blank">${doc.nombre}</a> - <em>${doc.tipo}</em>`;
+        lista.appendChild(li);
     });
 }
+
+// Listar archivos al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+    listarArchivos();
+});
 
 // Event listener para el botón de subida de archivo
 document.getElementById("btnSubir").addEventListener("click", subirArchivo);

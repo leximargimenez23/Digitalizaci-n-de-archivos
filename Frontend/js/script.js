@@ -14,12 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(error => console.error("Error cargando el menú:", error));
 
-    // Datos de prueba
-    let documentos = [
-        { nombre: "Informe Financiero 2024", tipo: "Financiero", fecha: "2025-03-20", resumen: "Resumen del informe", palabrasClave: "finanzas, cuentas, balance", archivo: "documento.pdf" },
-        { nombre: "Inventario Q1", tipo: "Inventario", fecha: "2025-03-18", resumen: "Lista de productos en stock", palabrasClave: "almacén, stock", archivo: "inventario.xlsx" }
-    ];
-
     // Función para mostrar los documentos en la tabla
     function mostrarDocumentos() {
         tablaDocumentos.innerHTML = "";
