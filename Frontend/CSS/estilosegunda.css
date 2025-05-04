@@ -13,7 +13,6 @@ body {
     padding: 20px;
     border-radius: 10px;
     width: 690px;
-    height: 800px;
     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
     border: 3px solid black;
 }
@@ -32,18 +31,26 @@ h3 {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 200px;
-    height: 200px;
+    width: 300px; /* Aumenta el tamaño para mejor visibilidad */
+    height: 210px; /* Permite que la altura se adapte */
+    max-height: 300px;
     background: black;
     border-radius: 10px;
     border: 5px solid white;
     margin: 0 auto;
     padding: 10px;
+    overflow: hidden;
 }
 
 .preview-box img {
-    width: 800px;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
 }
+
 
 .form-section {
     display: flex;
@@ -80,6 +87,14 @@ input, select {
     padding: 15px;
     border-radius: 10px;
     border: 5px solid white;
-    margin-top: 10px;
-    margin-left: 100px;
+    margin: 10px auto 0 auto;
+}
+
+.editable-box {
+    min-height: 60px;
+    max-height: none;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    word-break: break-word;
+    outline: none;
 }

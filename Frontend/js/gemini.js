@@ -23,7 +23,7 @@ async function extraerPalabrasClave(texto) {
 
 
     const requestBody = {
-        contents: [{ parts: [{ text: `Extrae palabras clave de este texto, devuélvelas como una lista separada por comas:\n\n${texto}` }] }]
+        contents: [{ parts: [{ text: `Extrae las palabras clave más relevantes del siguiente texto. Para cada palabra clave, genera dos sinónimos y, si la palabra contiene acento, añade su versión sin acento, tambien ingresa el autor y datos similares como fecha del documento. Devuelve únicamente un bloque de texto en el que todas las palabras se encuentren separadas por comas, sin ningún formato, etiqueta o encabezado adicional:\n\n${texto}` }] }]
     };
 
     const response = await fetch(url, {

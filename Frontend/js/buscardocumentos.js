@@ -49,6 +49,8 @@ export async function buscarDocumentos() {
 
   mostrarResultados(resultados);
 }
+
+
 function mostrarResultados(documentos) {
   const lista = document.getElementById("lista-documentos");
   const cantidad = document.getElementById("cantidad-resultados");

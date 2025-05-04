@@ -9,11 +9,15 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 export async function registerUser(email, password) {
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) throw new Error(error.message);
+    console.log("ID del usuario registrado:", data.user.id);
     return data.user; // Devolvemos el usuario para obtener el ID
 }
 
 // 🔹 Función para crear perfil después del registro
 export async function createUserProfile(userId, nombre) {
+
+    console.log("ID del perfil que se va a insertar:", userId);
+
     const { data, error } = await supabase
         .from("perfiles")
         .insert([{ id: userId, nombre: nombre }]);

@@ -199,7 +199,7 @@ async function subirArchivo() {
     // 👇 Guardar en la base de datos con el ID del usuario
     const { error: dbError } = await supabase.from("documentos_meta").insert([{
         nombre: fileNameInput,
-        tipo: fileFormat,
+        tipo: document.getElementById("file-format").value,
         url: fileUrl,
         resumen: resumen,
         palabras_clave: palabrasClave,
@@ -253,3 +253,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Event listener para el botón de subida de archivo
 document.getElementById("btnSubir").addEventListener("click", subirArchivo);
+
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('fileInput');
+    const previewImage = document.getElementById('preview-image');
+    const previewFrame = document.getElementById('preview-frame');
+    const previewDocx = document.getElementById('preview-docx');
+    const fileFormat = document.getElementById('file-format');
+
+    // Escuchar el cambio en el input de archivo
+    fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const fileURL = URL.createObjectURL(file);
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        if (!file) return;
+
+        // Ocultar todos los previsualizadores al principio
+        previewImage.style.display = 'none';
+        previewFrame.style.display = 'none';
+        previewDocx.style.display = 'none';
+
+        // Mostrar vista previa según el tipo de archivo
+        if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
+            previewImage.src = fileURL;
+            previewImage.style.display = 'block';
+        } else if (extension === 'pdf') {
+            previewFrame.src = fileURL;
+            previewFrame.style.display = 'block';
+        } else if (extension === 'docx') {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                mammoth.convertToHtml({ arrayBuffer: event.target.result })
+                    .then(function(result) {
+                        previewDocx.style.display = 'block';
+                        previewDocx.innerHTML = result.value;
+                    })
+                    .catch(function(err) {
+                        console.error("Error mostrando .docx", err);
+                    });
+            };
+            reader.readAsArrayBuffer(file);
+        } else {
+            alert("Formato no compatible para vista previa.");
+        }
+    });
+
+    // Evitar que cambiar el tipo de documento (select) afecte la vista previa
+    fileFormat.addEventListener('change', function() {
+        const selectedValue = fileFormat.value;
+        console.log("Clasificación seleccionada:", selectedValue);
+        // Aquí puedes procesar la clasificación si lo deseas
+        // La vista previa no debe cambiar al seleccionar el tipo
+    });
+});
+
+
